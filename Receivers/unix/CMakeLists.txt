@@ -80,6 +80,17 @@ if (SNDIO_ENABLE)
   endif ()
 endif ()
 
+option(COREAUDIO_ENABLE "Enable CoreAudio" ON)
+if (COREAUDIO_ENABLE)
+  find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+  if (AUDIOTOOLBOX_LIBRARY)
+    target_link_libraries(${PROJECT_NAME} ${AUDIOTOOLBOX_LIBRARY})
+    target_sources(${PROJECT_NAME} PRIVATE coreaudio.c)
+  else ()
+    set(COREAUDIO_ENABLE OFF)
+  endif ()
+endif ()
+
 configure_file(config.h.in config.h)
 target_include_directories(${PROJECT_NAME} PUBLIC "${PROJECT_BINARY_DIR}")
 

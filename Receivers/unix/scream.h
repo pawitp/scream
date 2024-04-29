@@ -8,7 +8,7 @@ enum receiver_type {
 };
 
 enum output_type {
-  Raw, Alsa, Pulseaudio, Jack, Sndio
+  Raw, Alsa, Pulseaudio, Jack, Sndio, CoreAudio
 };
 
 typedef struct receiver_format {
@@ -24,6 +24,6 @@ typedef struct receiver_data {
   unsigned char* audio;
 } receiver_data_t;
 
-static int verbosity = 0;
+extern int verbosity;
 
 #endif
