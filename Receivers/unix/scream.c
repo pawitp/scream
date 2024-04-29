@@ -40,6 +40,12 @@
 #include "sndio.h"
 #endif
 
+#if COREAUDIO_ENABLE
+#include "coreaudio.h"
+#endif
+
+int verbosity = 0;
+
 static void show_usage(const char *arg0)
 {
   fprintf(stderr, "\n");
@@ -138,6 +144,8 @@ int main(int argc, char*argv[]) {
   enum output_type output_mode = Jack;
 #elif SNDIO_ENABLE
   enum output_type output_mode = Sndio;
+#elif COREAUDIO_ENABLE
+  enum output_type output_mode = CoreAudio;
 #else
   enum output_type output_mode = Raw;
 #endif
@@ -186,6 +194,7 @@ int main(int argc, char*argv[]) {
       else if (strcmp(output,"alsa") == 0) output_mode = Alsa;
       else if (strcmp(output,"jack") == 0) output_mode = Jack;
       else if (strcmp(output,"sndio") == 0) output_mode = Sndio;
+      else if (strcmp(output,"coreaudio") == 0) output_mode = CoreAudio;
       else if (strcmp(output,"raw") == 0) output_mode = Raw;
       else {
         fprintf(stderr, "invalid output: %s\n", output);
@@ -282,6 +291,18 @@ int main(int argc, char*argv[]) {
       output_send_fn = sndio_output_send;
 #else
       fprintf(stderr, "%s compiled without sndio support. Aborting\n", argv[0]);
+      return 1;
+#endif
+      break;
+    case CoreAudio:
+#if COREAUDIO_ENABLE
+      if (verbosity) fprintf(stderr, "Using CoreAudio output\n");
+      if (coreaudio_output_init(max_latency_ms) != 0) {
+        return 1;
+      }
+      output_send_fn = coreaudio_output_send;
+#else
+      fprintf(stderr, "%s compiled without CoreAudio support. Aborting\n", argv[0]);
       return 1;
 #endif
       break;
